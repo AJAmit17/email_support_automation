@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Customer History - Smart Email Management</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.1/font/bootstrap-icons.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#4F46E5',
+                        secondary: '#6B7280',
+                        success: '#10B981',
+                        danger: '#EF4444',
+                        warning: '#F59E0B',
+                        info: '#3B82F6'
+                    }
+                }
+            }
+        }
+    </script>
+    <style type="text/tailwindcss">
+        @layer components {
+            .badge {
+                @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium;
+            }
+            .priority-badge {
+                @apply badge min-w-[100px] justify-center;
+            }
+            .sentiment-badge {
+                @apply badge min-w-[100px] justify-center;
+            }
+            .category-badge {
+                @apply badge bg-indigo-500 text-white;
+            }
+            .status-badge {
+                @apply badge min-w-[100px] justify-center;
+            }
+            .status-pending { 
+                @apply bg-warning text-white; 
+            }
+            .status-in-progress { 
+                @apply bg-info text-white; 
+            }
+            .status-resolved { 
+                @apply bg-success text-white; 
+            }
+            .status-closed { 
+                @apply bg-gray-500 text-white; 
+            }
+            .nav-link {
+                @apply text-gray-300 hover:text-white hover:bg-gray-700 px-3 py-2 rounded-md text-sm font-medium transition duration-150 ease-in-out;
+            }
+            .nav-link.active {
+                @apply bg-primary text-white;
+            }
+            .btn {
+                @apply px-4 py-2 rounded-lg font-medium transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-opacity-50;
+            }
+            .btn-primary {
+                @apply bg-primary text-white hover:bg-indigo-700 focus:ring-indigo-500;
+            }
+            .btn-outline {
+                @apply bg-white text-gray-700 border border-gray-300 hover:bg-gray-50 focus:ring-gray-500;
+            }
+        }
+    </style>
+</head>
+<body class="bg-gray-100 min-h-screen">
+    <!-- Updated Navigation Bar for better desktop visibility -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-gray-900 border-b border-gray-800">
+        <div class="container-fluid">
+            <a class="navbar-brand d-flex align-items-center" href="/">
+                <i class="bi bi-envelope-check text-xl text-indigo-400 me-2"></i>
+                <span class="fw-bold text-white">Smart Email Management</span>
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-4">
+                    <li class="nav-item me-3">
+                        <a class="nav-link fw-bold py-2 px-4 rounded-md" href="/">
+                            <i class="bi bi-speedometer2 me-2"></i> DASHBOARD
+                        </a>
+                    </li>
+                    <li class="nav-item me-3">
+                        <a class="nav-link fw-bold py-2 px-4 rounded-md" href="/analytics">
+                            <i class="bi bi-graph-up me-2"></i> ANALYTICS
+                        </a>
+                    </li>
+                </ul>
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                            <img class="rounded-circle me-1" width="32" height="32" src="https://ui-avatars.com/api/?name=Admin+User&background=4F46E5&color=fff" alt="User">
+                            <span class="d-none d-md-inline">Admin User</span>
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end">
+                            <li><a class="dropdown-item" href="#"><i class="bi bi-person me-2"></i> Profile</a></li>
+                            <li><a class="dropdown-item" href="#"><i class="bi bi-gear me-2"></i> Settings</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item text-danger" href="#"><i class="bi bi-box-arrow-right me-2"></i> Logout</a></li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+        <div class="mb-6">
+            <a href="/" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-gray-700 bg-gray-200 hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 transition duration-150 ease-in-out">
+                <i class="bi bi-arrow-left mr-2"></i> Back to Dashboard
+            </a>
+            
+            <div class="mt-4 bg-white rounded-xl shadow-md overflow-hidden hover:shadow-lg transition duration-300">
+                <div class="bg-gradient-to-r from-indigo-600 to-purple-600 px-4 py-4 text-white">
+                    <div class="flex justify-between items-center">
+                        <h5 class="text-lg font-medium flex items-center">
+                            <i class="bi bi-person-badge mr-2"></i> Customer Profile: {{ customer_id }}
+                        </h5>
+                    </div>
+                </div>
+                <div class="p-6">
+                    <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+                        <div class="md:col-span-1 flex flex-col items-center">
+                            <div class="text-center">
+                                <div class="mb-4">
+                                    <img class="h-24 w-24 rounded-full mx-auto" src="https://ui-avatars.com/api/?name={{ customer_id }}&background=4F46E5&color=fff&size=128" alt="">
+                                </div>
+                                <div class="relative inline-flex">
+                                    <div class="h-28 w-28 rounded-full overflow-hidden flex items-center justify-center 
+                                        {{ 'bg-gradient-to-br from-green-400 to-green-600' if metrics.sentiment_score >= 70 
+                                        else 'bg-gradient-to-br from-yellow-400 to-yellow-600' if metrics.sentiment_score >= 40 
+                                        else 'bg-gradient-to-br from-red-400 to-red-600' }}">
+                                        <div class="h-24 w-24 bg-white rounded-full flex flex-col items-center justify-center">
+                                            <span class="text-3xl font-bold {{ 'text-green-600' if metrics.sentiment_score >= 70 
+                                                else 'text-yellow-600' if metrics.sentiment_score >= 40 
+                                                else 'text-red-600' }}">{{ metrics.sentiment_score|int }}</span>
+                                            <span class="text-xs text-gray-500">Sentiment</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="md:col-span-3">
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                                <div class="flex flex-col items-center p-4 bg-white rounded-lg shadow-sm border border-gray-200 hover:shadow-md transition duration-300">
+                                    <span class="text-3xl font-bold text-gray-800">{{ metrics.total_emails }}</span>
+                                    <span class="text-sm text-gray-600">Total Emails</span>
+                                </div>
+                                <div class="flex flex-col items-center p-4 bg-white rounded-lg shadow-sm border border-gray-200 hover:shadow-md transition duration-300">
+                                    <span class="text-3xl font-bold text-green-600">{{ metrics.resolved_emails }}</span>
+                                    <span class="text-sm text-gray-600">Resolved Issues</span>
+                                </div>
+                                <div class="flex flex-col items-center p-4 bg-white rounded-lg shadow-sm border border-gray-200 hover:shadow-md transition duration-300">
+                                    <span class="text-3xl font-bold text-indigo-600">{{ "%.1f"|format(metrics.avg_response_time) }}</span>
+                                    <span class="text-sm text-gray-600">Avg Response (hrs)</span>
+                                </div>
+                            </div>
+                                        <div class="bg-yellow-500 h-full text-center text-xs text-white flex items-center justify-center" 
+                                             style="width: {{ (neutral / total * 100)|int }}%">
+                                            {% if neutral > 0 %}{{ neutral }}{% endif %}
+                                        </div>
+                                        <div class="bg-orange-500 h-full text-center text-xs text-white flex items-center justify-center" 
+                                             style="width: {{ (negative / total * 100)|int }}%">
+                                            {% if negative > 0 %}{{ negative }}{% endif %}
+                                        </div>
+                                        <div class="bg-red-500 h-full text-center text-xs text-white flex items-center justify-center" 
+                                             style="width: {{ (very_negative / total * 100)|int }}%">
+                                            {% if very_negative > 0 %}{{ very_negative }}{% endif %}
+                                        </div>
+                                    </div>
+                                </div>0">
+                                <div class="flex justify-between text-xs text-gray-600 mt-1">tribution</h6>
+                                    <span class="text-green-600">Positive</span>full h-6 bg-gray-200 rounded-full overflow-hidden">
+                                    <span class="text-yellow-600">Neutral</span>
+                                    <span class="text-orange-500">Negative</span>%}
+                                    <span class="text-red-600">Very Negative</span>ve', 0) %}
+                                </div>y_negative = metrics.sentiment_counts.get('Very Negative', 0) %}
+                            </div>
+                        </div>
+                    </div>
+                </div>lass="bg-green-500 h-full text-center text-xs text-white flex items-center justify-center" 
+            </div>   style="width: {{ (positive / total * 100)|int }}%">
+                  {% if positive > 0 %}{{ positive }}{% endif %}
+            <div class="mt-6 bg-white rounded-xl shadow-md overflow-hidden hover:shadow-lg transition duration-300">
+                <div class="bg-gradient-to-r from-indigo-600 to-purple-600 px-4 py-4 text-white">nter text-xs text-white flex items-center justify-center" 
+                    <h5 class="text-lg font-medium flex items-center"> 100)|int }}%">
+                        <i class="bi bi-envelope mr-2"></i> Email Historyndif %}
+                    </h5>
+                </div>  <div class="bg-orange-500 h-full text-center text-xs text-white flex items-center justify-center" 
+                <div class="p-6">           style="width: {{ (negative / total * 100)|int }}%">
+                    <div class="flex justify-between items-center mb-4">              {% if negative > 0 %}{{ negative }}{% endif %}
+                        <h5 class="text-xl font-bold text-gray-800">              </div>
+                            Customer Emails                   <div class="bg-red-500 h-full text-center text-xs text-white flex items-center justify-center" 
+                            <span class="inline-flex items-center justify-center h-6 w-6 rounded-full bg-indigo-100 text-indigo-800 text-xs font-medium">                           style="width: {{ (very_negative / total * 100)|int }}%">
+                                {{ emails|length }}                                {% if very_negative > 0 %}{{ very_negative }}{% endif %}
+                            </span>
+                        </h5>
+                        
+                        <div class="flex">text-gray-600 mt-1">
+                            <button class="btn btn-outline mr-2">           <span class="text-green-600">Positive</span>
+                                <i class="bi bi-download mr-1"></i> Export              <span class="text-yellow-600">Neutral</span>
+                            </button>   <span class="text-orange-500">Negative</span>
+                            <button class="btn btn-primary">tive</span>
+                                <i class="bi bi-plus mr-1"></i> New Email
+                            </button>
+                        </div>
+                    </div>
+                    
+                    {% if emails %}
+                        <div class="overflow-x-auto rounded-lg shadow-sm border border-gray-200">
+                            <table class="min-w-full divide-y divide-gray-200">ded-xl shadow-md overflow-hidden hover:shadow-lg transition duration-300">
+                                <thead class="bg-gray-50">urple-600 px-4 py-4 text-white">
+                                    <tr>
+                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>bi-envelope mr-2"></i> Email History
+                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Subject</th>
+                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Category</th>
+                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Sentiment</th>
+                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Priority</th>="flex justify-between items-center mb-4">
+                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>5 class="text-xl font-bold text-gray-800">
+                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>        Customer Emails 
+                                    </tr>lass="inline-flex items-center justify-center h-6 w-6 rounded-full bg-indigo-100 text-indigo-800 text-xs font-medium">
+                                </thead>
+                                <tbody class="bg-white divide-y divide-gray-200">
+                                    {% for email in emails %}
+                                    <tr class="hover:bg-gray-50 transition">
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ email.timestamp|format_datetime }}</td>
+                                        <td class="px-6 py-4 text-sm text-gray-900 max-w-[200px] truncate">{{ email.subject }}</td>
+                                        <td class="px-6 py-4 whitespace-nowrap">
+                                            <span class="category-badge">{{ email.category }}</span>
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap">
+                                            <span class="sentiment-badge" style="background-color: {{ email.sentiment|sentiment_color }}">
+                                                {{ email.sentiment }}
+                                            </span>
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap">
+                                            <span class="priority-badge" style="background-color: {{ email.priority|priority_color }}">der border-gray-200">
+                                                Priority {{ email.priority }}
+                                            </span>
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap">um text-gray-500 uppercase tracking-wider">Date</th>
+                                            <span class="status-badge status-{{ email.status }}">cope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Subject</th>
+                                                {{ email.status|capitalize }}ft text-xs font-medium text-gray-500 uppercase tracking-wider">Category</th>
+                                            </span>der">Sentiment</th>
+                                        </td>y-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Priority</th>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                                            <a href="/view-email/{{ email._id }}" class="text-indigo-600 hover:text-indigo-900 mr-3">cope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                                                <i class="bi bi-eye"></i> View
+                                            </a>
+                                        </td>00">
+                                    </tr> emails %}
+                                    {% endfor %}="hover:bg-gray-50 transition">
+                                </tbody>ext-sm text-gray-500">{{ email.timestamp|format_datetime }}</td>
+                            </table>truncate">{{ email.subject }}</td>
+                        </div>p">
+                    {% else %}lass="category-badge">{{ email.category }}</span>
+                        <div class="bg-blue-50 border-l-4 border-blue-400 p-4 rounded-md">
+                            <div class="flex">
+                                <i class="bi bi-info-circle text-blue-500 flex-shrink-0 mr-3"></i> }}">
+                                <p class="text-blue-700">No email history found for this customer.</p>
+                            </div>an>
+                        </div>
+                    {% endif %}td class="px-6 py-4 whitespace-nowrap">
+                </div>n class="priority-badge" style="background-color: {{ email.priority|priority_color }}">
+            </div>        Priority {{ email.priority }}
+        </div>        </span>
+    </div>          </td>
+          <td class="px-6 py-4 whitespace-nowrap">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>us }}">
+</body>  {{ email.status|capitalize }}
+</html>
+                            <div class="flex">
+                                <i class="bi bi-info-circle text-blue-500 flex-shrink-0 mr-3"></i>
+                                <p class="text-blue-700">No email history found for this customer.</p>
+                            </div>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
