@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Raise a Support Request</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Add Font Awesome for icons -->
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            colors: {
+              primary: "#4F46E5",
+              secondary: "#8B5CF6",
+            },
+          },
+        },
+      };
+    </script>
+  </head>
+  <body
+    class="bg-gradient-to-br from-gray-50 to-gray-100 min-h-screen p-4 md:p-12 font-sans flex items-center justify-center"
+  >
+    <div class="w-full max-w-xl">
+      <!-- Header Card -->
+      <div
+        class="bg-gradient-to-r from-primary to-secondary p-6 rounded-t-xl shadow-lg flex items-center"
+      >
+        <div class="bg-white bg-opacity-20 p-3 rounded-full">
+          <i class="fas fa-headset text-white text-2xl"></i>
+        </div>
+        <h1 class="text-2xl md:text-3xl font-bold text-white ml-4">
+          Support Center
+        </h1>
+      </div>
+
+      <!-- Form Card -->
+      <form
+        action="/submit"
+        method="POST"
+        class="bg-white p-8 rounded-b-xl shadow-lg"
+      >
+        <h2 class="text-xl font-semibold mb-6 text-gray-800">
+          Submit a New Request
+        </h2>
+
+        <div class="mb-6">
+          <label for="message" class="block text-gray-700 font-medium mb-2">
+            Describe your issue:
+          </label>
+          <textarea
+            name="message"
+            required
+            placeholder="Please provide details about your problem..."
+            class="w-full h-36 p-4 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition duration-200 bg-gray-50 text-gray-800"
+          ></textarea>
+        </div>
+
+        <div class="flex justify-end">
+          <button
+            type="submit"
+            class="px-6 py-3 bg-primary text-white rounded-lg hover:bg-opacity-90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary transition duration-200 flex items-center font-medium shadow-md"
+          >
+            Submit Request
+            <i class="fas fa-paper-plane ml-2"></i>
+          </button>
+        </div>
+      </form>
+
+      <!-- Footer Text -->
+      <p class="text-center text-gray-500 text-sm mt-4">
+        We typically respond to requests within 24 hours.
+      </p>
+    </div>
+  </body>
+</html>

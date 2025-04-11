@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Support Inbox Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <meta http-equiv="refresh" content="60">
+</head>
+<body class="bg-slate-100 min-h-screen">
+    <div class="container mx-auto px-4 py-8">
+        <!-- Header -->
+        <header class="mb-10">
+            <div class="flex items-center justify-between">
+                <h1 class="text-3xl font-bold text-slate-800 flex items-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 mr-2 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                    </svg>
+                    Support Email Dashboard
+                </h1>
+                <div class="bg-white px-4 py-2 rounded-lg shadow text-sm text-slate-600">
+                    Last updated: <span id="current-time" class="font-medium"></span>
+                </div>
+            </div>
+        </header>
+
+        <!-- Dashboard Grid -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            {% for category, emails in email_log.items() %}
+            <div class="bg-white rounded-xl shadow-md overflow-hidden">
+                <!-- Category Header -->
+                <div class="p-4 {% if category == 'Technical' %}bg-blue-600{% elif category == 'Billing' %}bg-emerald-600{% elif category == 'Complaint' %}bg-red-600{% elif category == 'General Inquiry' %}bg-amber-600{% else %}bg-gray-600{% endif %} text-white">
+                    <div class="flex justify-between items-center">
+                        <h2 class="text-lg font-semibold">{{ category }}</h2>
+                        <span class="bg-white text-slate-800 rounded-full px-2 py-1 text-xs font-bold">{{ emails|length }}</span>
+                    </div>
+                </div>
+                
+                <!-- Email List -->
+                <div class="divide-y divide-slate-200 max-h-[500px] overflow-y-auto">
+                    {% if emails|length == 0 %}
+                    <div class="p-4 text-center text-slate-500">
+                        <p>No emails in this category</p>
+                    </div>
+                    {% else %}
+                    {% for mail in emails %}
+                    <div class="p-4 hover:bg-slate-50 transition-colors">
+                        <div class="flex items-start space-x-3">
+                            <div class="flex-shrink-0 mt-1">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" />
+                                </svg>
+                            </div>
+                            <div class="flex-1 min-w-0">
+                                <p class="text-sm font-medium text-slate-800 truncate">{{ mail.subject }}</p>
+                                <p class="text-xs text-slate-500 mt-1">From: {{ mail.from }}</p>
+                                <p class="text-xs text-slate-500 mt-1">Forwarded to: <span class="font-medium">{{ mail.forwarded_to }}</span></p>
+                                <p class="text-xs text-slate-600 mt-2 line-clamp-2">{{ mail.body[:150] }}{% if mail.body|length > 150 %}...{% endif %}</p>
+                                <p class="text-xs text-slate-400 mt-2">{{ mail.timestamp }}</p>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                    {% endif %}
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <script>
+        function updateTime() {
+            const now = new Date();
+            document.getElementById('current-time').textContent = now.toLocaleTimeString();
+        }
+        updateTime();
+        setInterval(updateTime, 1000);
+    </script>
+</body>
+</html>
